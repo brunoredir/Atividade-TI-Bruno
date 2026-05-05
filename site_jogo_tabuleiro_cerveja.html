@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Whipped Process | Jogo do Processo da Cerveja</title>
+  <style>
+    :root {
+      --bg: #1f1206;
+      --panel: #331b08;
+      --panel-2: #4a2608;
+      --gold: #e49a11;
+      --gold-2: #ffbd2f;
+      --cream: #fff4d7;
+      --text: #fff8ea;
+      --muted: #d8b779;
+      --green: #b9ff9a;
+      --green-dark: #2d7d38;
+      --yellow: #fff59b;
+      --yellow-dark: #8b6b00;
+      --red: #ffaaa3;
+      --red-dark: #9a281f;
+      --ok: #64d176;
+      --danger: #ff6d5f;
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(255,189,47,.22), transparent 34rem),
+        repeating-linear-gradient(135deg, rgba(255, 170, 34, .08) 0 18px, transparent 18px 48px),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    button, input { font: inherit; }
+
+    button {
+      border: none;
+      cursor: pointer;
+      transition: transform .16s ease, filter .16s ease, background .16s ease;
+    }
+
+    button:hover { transform: translateY(-1px); filter: brightness(1.04); }
+    button:active { transform: translateY(0); }
+    button:disabled { cursor: not-allowed; opacity: .55; transform: none; }
+
+    .page {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 56px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap: 20px;
+      align-items: stretch;
+      margin-top: 12px;
+    }
+
+    .card {
+      background: linear-gradient(145deg, rgba(74,38,8,.96), rgba(43,24,10,.96));
+      border: 1px solid rgba(255, 189, 47, .28);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-main {
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-main::after {
+      content: "";
+      position: absolute;
+      right: -90px;
+      bottom: -90px;
+      width: 240px;
+      height: 240px;
+      border-radius: 999px;
+      background: rgba(228,154,17,.16);
+      border: 26px solid rgba(255,189,47,.12);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #160b02;
+      background: linear-gradient(90deg, var(--gold), var(--gold-2));
+      font-weight: 900;
+      padding: 8px 12px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 7vw, 4.5rem);
+      line-height: .95;
+      letter-spacing: -2px;
+    }
+
+    .subtitle {
+      color: var(--cream);
+      font-size: clamp(1rem, 2.2vw, 1.25rem);
+      max-width: 780px;
+      line-height: 1.55;
+      margin: 18px 0 0;
+    }
+
+    .hero-side {
+      padding: 22px;
+      display: grid;
+      gap: 14px;
+      align-content: center;
+    }
+
+    .logo {
+      width: 128px;
+      height: 128px;
+      border-radius: 999px;
+      background: radial-gradient(circle, #2c1708 48%, #8b4b0d 49%, #e49a11 62%, #321906 64%);
+      display: grid;
+      place-items: center;
+      margin: 0 auto;
+      box-shadow: inset 0 0 0 7px rgba(0,0,0,.22), 0 18px 38px rgba(0,0,0,.35);
+      color: var(--gold-2);
+      font-size: 2.8rem;
+      font-weight: 900;
+      letter-spacing: -4px;
+      position: relative;
+    }
+
+    .logo::before {
+      content: "♨";
+      position: absolute;
+      top: 15px;
+      font-size: 2rem;
+      color: #bb7415;
+    }
+
+    .logo span { margin-top: 26px; }
+
+    .mini-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .mini-stat {
+      background: rgba(255,244,215,.08);
+      border: 1px solid rgba(255,244,215,.12);
+      border-radius: 16px;
+      padding: 12px 8px;
+      text-align: center;
+    }
+
+    .mini-stat strong {
+      display: block;
+      color: var(--gold-2);
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+
+    .mini-stat small { color: var(--muted); font-weight: 700; }
+
+    .section { margin-top: 22px; }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    h2 { margin: 0; font-size: clamp(1.35rem, 3vw, 2rem); }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .category-card {
+      padding: 18px;
+      min-height: 170px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: #1e1003;
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      border: 5px solid rgba(64,32,6,.72);
+    }
+
+    .category-card h3 { margin: 0 0 10px; font-size: 1.24rem; }
+    .category-card p { margin: 0; font-weight: 700; line-height: 1.35; }
+    .category-card small { margin-top: 14px; font-weight: 900; opacity: .75; }
+
+    .green { background: linear-gradient(145deg, #cdffbc, var(--green)); }
+    .yellow { background: linear-gradient(145deg, #fffbd4, var(--yellow)); }
+    .red { background: linear-gradient(145deg, #ffd0cc, var(--red)); }
+
+    .setup {
+      padding: 22px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .setup p, .rules p { color: var(--cream); line-height: 1.55; margin: 8px 0 0; }
+
+    .form-grid { display: grid; gap: 10px; margin-top: 14px; }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid rgba(255,244,215,.2);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      border-radius: 16px;
+      padding: 13px 14px;
+      outline: none;
+    }
+
+    input:focus { border-color: var(--gold-2); box-shadow: 0 0 0 3px rgba(255,189,47,.14); }
+
+    .btn {
+      background: linear-gradient(90deg, var(--gold), var(--gold-2));
+      color: #160b02;
+      font-weight: 900;
+      border-radius: 16px;
+      padding: 13px 16px;
+    }
+
+    .btn.secondary {
+      background: rgba(255,244,215,.1);
+      color: var(--text);
+      border: 1px solid rgba(255,244,215,.16);
+    }
+
+    .btn.danger {
+      background: rgba(255,109,95,.16);
+      color: #ffdcd8;
+      border: 1px solid rgba(255,109,95,.35);
+    }
+
+    .rules {
+      background: rgba(0,0,0,.17);
+      border-radius: 20px;
+      padding: 18px;
+      border: 1px solid rgba(255,244,215,.12);
+    }
+
+    .rules ol {
+      margin: 12px 0 0;
+      padding-left: 20px;
+      color: var(--cream);
+      line-height: 1.55;
+      font-weight: 700;
+    }
+
+    .game-area {
+      display: none;
+      grid-template-columns: .72fr 1.28fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .scoreboard { padding: 18px; position: sticky; top: 12px; }
+
+    .score-list { display: grid; gap: 10px; margin-top: 14px; }
+
+    .score-player {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      background: rgba(255,244,215,.08);
+      border: 1px solid rgba(255,244,215,.12);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .score-player.active { outline: 3px solid rgba(255,189,47,.28); background: rgba(255,189,47,.12); }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: var(--gold);
+      color: #1e1003;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+    }
+
+    .score-player strong { display: block; }
+    .score-player small { color: var(--muted); font-weight: 700; }
+    .score-points { color: var(--gold-2); font-size: 1.35rem; font-weight: 900; }
+
+    .progress-wrap { margin-top: 18px; }
+    .progress-label { display: flex; justify-content: space-between; color: var(--muted); font-weight: 800; margin-bottom: 8px; }
+    .progress {
+      height: 12px;
+      background: rgba(255,244,215,.11);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--gold), var(--gold-2)); transition: width .25s ease; }
+
+    .play-panel { padding: 18px; }
+
+    .board-toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .turn-pill {
+      color: #160b02;
+      background: var(--gold-2);
+      font-weight: 900;
+      border-radius: 999px;
+      padding: 9px 13px;
+    }
+
+    .activity-card {
+      min-height: 440px;
+      background:
+        linear-gradient(rgba(255, 180, 37, .08), rgba(0,0,0,.05)),
+        repeating-linear-gradient(135deg, rgba(255,189,47,.08) 0 16px, transparent 16px 45px),
+        #633507;
+      border: 8px solid rgba(255,244,215,.16);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .activity-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      position: relative;
+      z-index: 1;
+    }
+
+    .number-badge {
+      width: 76px;
+      height: 76px;
+      background: var(--gold);
+      color: #160b02;
+      border-radius: 0 0 18px 0;
+      display: grid;
+      place-items: center;
+      font-size: 2.4rem;
+      font-weight: 900;
+      box-shadow: 8px 8px 0 rgba(0,0,0,.6);
+      margin: -18px 0 0 -18px;
+    }
+
+    .stage-pill {
+      background: rgba(0,0,0,.36);
+      border: 1px solid rgba(255,244,215,.18);
+      color: var(--cream);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 900;
+      text-align: right;
+    }
+
+    .activity-illustration {
+      display: grid;
+      place-items: center;
+      min-height: 168px;
+      margin: 18px 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .beer-icon {
+      width: min(230px, 65vw);
+      height: 145px;
+    }
+
+    .activity-body {
+      background: rgba(20,10,3,.82);
+      border: 1px solid rgba(255,244,215,.14);
+      border-radius: 22px;
+      padding: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .activity-body h3 {
+      margin: 0 0 10px;
+      font-size: clamp(1.45rem, 5vw, 2rem);
+      line-height: 1.05;
+    }
+
+    .activity-body p {
+      margin: 0;
+      color: var(--cream);
+      line-height: 1.5;
+      font-weight: 700;
+    }
+
+    .answer-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .answer-btn {
+      min-height: 74px;
+      border-radius: 18px;
+      padding: 12px;
+      color: #1e1003;
+      font-weight: 900;
+      border: 4px solid rgba(64,32,6,.72);
+      text-align: center;
+    }
+
+    .answer-btn small { display: block; margin-top: 4px; opacity: .75; }
+
+    .feedback {
+      display: none;
+      margin-top: 14px;
+      border-radius: 18px;
+      padding: 14px;
+      border: 1px solid rgba(255,244,215,.14);
+      background: rgba(255,244,215,.08);
+      line-height: 1.45;
+      font-weight: 800;
+    }
+
+    .feedback.correct { border-color: rgba(100,209,118,.45); background: rgba(100,209,118,.14); }
+    .feedback.wrong { border-color: rgba(255,109,95,.45); background: rgba(255,109,95,.14); }
+
+    .next-row { display: none; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+
+    .end-screen {
+      display: none;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .winner-box {
+      max-width: 640px;
+      margin: 18px auto 0;
+      background: rgba(255,189,47,.12);
+      border: 1px solid rgba(255,189,47,.34);
+      border-radius: 22px;
+      padding: 18px;
+    }
+
+    .ranking { display: grid; gap: 10px; margin-top: 16px; text-align: left; }
+    .rank-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      background: rgba(255,244,215,.08);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: 20px;
+      border: 1px solid rgba(255,244,215,.14);
+      background: rgba(0,0,0,.18);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,244,215,.12);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: rgba(228,154,17,.24);
+      color: var(--gold-2);
+      font-size: .9rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    td { color: var(--cream); font-weight: 700; line-height: 1.35; }
+
+    .class-pill {
+      display: inline-flex;
+      padding: 7px 10px;
+      border-radius: 999px;
+      color: #1e1003;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .class-value { background: var(--green); }
+    .class-necessary { background: var(--yellow); }
+    .class-waste { background: var(--red); }
+
+    details.card { padding: 18px; }
+    summary { cursor: pointer; font-size: 1.25rem; font-weight: 900; color: var(--gold-2); }
+
+    .footer-note {
+      color: var(--muted);
+      text-align: center;
+      margin-top: 24px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 860px) {
+      .hero, .setup, .game-area { grid-template-columns: 1fr; }
+      .scoreboard { position: static; }
+      .grid-3 { grid-template-columns: 1fr; }
+      .answer-buttons { grid-template-columns: 1fr; }
+      .hero-main { padding: 22px; }
+      .activity-card { min-height: auto; }
+      .mini-stats { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .page { width: min(100% - 18px, 1180px); padding-top: 10px; }
+      .hero-main, .hero-side, .setup, .play-panel, .scoreboard, .end-screen { padding: 15px; }
+      .logo { width: 96px; height: 96px; font-size: 2rem; }
+      .logo::before { top: 11px; font-size: 1.5rem; }
+      .number-badge { width: 62px; height: 62px; font-size: 1.9rem; }
+      .activity-card { padding: 14px; border-width: 5px; border-radius: 22px; }
+      .number-badge { margin: -14px 0 0 -14px; }
+      .stage-pill { font-size: .86rem; }
+      .mini-stats { gap: 6px; }
+      .mini-stat { padding: 10px 5px; }
+      .mini-stat strong { font-size: 1.12rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-main card">
+        <div class="tag">🍺 Jogo de cartas educativo</div>
+        <h1>Whipped<br>Process</h1>
+        <p class="subtitle">
+          Jogo do processo de fabricação da cerveja. Leia a carta, analise a atividade e escolha se ela agrega valor, não agrega mas é necessária, ou não agrega valor.
+        </p>
+      </div>
+
+      <aside class="hero-side card">
+        <div class="logo"><span>WB</span></div>
+        <div class="mini-stats">
+          <div class="mini-stat"><strong>30</strong><small>cartas</small></div>
+          <div class="mini-stat"><strong>3</strong><small>classes</small></div>
+          <div class="mini-stat"><strong>10</strong><small>cada</small></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section">
+      <div class="section-title"><h2>Classificações</h2></div>
+      <div class="grid-3">
+        <article class="category-card green">
+          <div>
+            <h3>Agrega valor</h3>
+            <p>Atividade que transforma diretamente o produto ou melhora aquilo que o cliente reconhece como valor.</p>
+          </div>
+          <small>Cor: verde</small>
+        </article>
+        <article class="category-card yellow">
+          <div>
+            <h3>Não agrega, mas é necessário</h3>
+            <p>Atividade que não transforma o produto diretamente, mas é importante para controle, segurança, transporte ou conformidade.</p>
+          </div>
+          <small>Cor: amarelo</small>
+        </article>
+        <article class="category-card red">
+          <div>
+            <h3>Não agrega valor</h3>
+            <p>Atividade que representa espera, retrabalho, excesso, erro, movimentação inútil ou desperdício.</p>
+          </div>
+          <small>Cor: vermelho</small>
+        </article>
+      </div>
+    </section>
+
+    <section id="setup" class="section setup card">
+      <div>
+        <h2>Preparar partida</h2>
+        <p>Cadastre de 1 a 4 participantes. As 30 cartas serão embaralhadas. Vence quem tiver mais acertos no final.</p>
+        <div class="form-grid" id="playersForm">
+          <div class="input-row"><input id="player1" value="Jogador 1" aria-label="Nome do jogador 1"><button class="btn secondary" type="button" onclick="clearInput('player1')">Limpar</button></div>
+          <div class="input-row"><input id="player2" value="Jogador 2" aria-label="Nome do jogador 2"><button class="btn secondary" type="button" onclick="clearInput('player2')">Limpar</button></div>
+          <div class="input-row"><input id="player3" placeholder="Jogador 3 opcional" aria-label="Nome do jogador 3"><button class="btn secondary" type="button" onclick="clearInput('player3')">Limpar</button></div>
+          <div class="input-row"><input id="player4" placeholder="Jogador 4 opcional" aria-label="Nome do jogador 4"><button class="btn secondary" type="button" onclick="clearInput('player4')">Limpar</button></div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
+          <button class="btn" type="button" onclick="startGame()">Iniciar jogo</button>
+          <button class="btn secondary" type="button" onclick="scrollToTable()">Ver tabela de respostas</button>
+        </div>
+      </div>
+
+      <div class="rules">
+        <h2>Regras</h2>
+        <ol>
+          <li>Um jogador por vez lê a carta apresentada.</li>
+          <li>O jogador escolhe uma das três classificações.</li>
+          <li>Cada acerto vale 1 ponto.</li>
+          <li>Depois da resposta, o site mostra a correção e a justificativa.</li>
+          <li>Ao terminar as 30 cartas, o ranking aparece automaticamente.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="game" class="section game-area">
+      <aside class="scoreboard card">
+        <h2>Placar</h2>
+        <div id="scoreList" class="score-list"></div>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>Progresso</span><span id="progressText">0/30</span></div>
+          <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
+          <button class="btn secondary" type="button" onclick="restartGame()">Reiniciar</button>
+          <button class="btn danger" type="button" onclick="backToSetup()">Sair</button>
+        </div>
+      </aside>
+
+      <div class="play-panel card">
+        <div class="board-toolbar">
+          <div class="turn-pill" id="turnPill">Vez de: Jogador</div>
+          <button class="btn secondary" type="button" onclick="toggleAnswerMode()" id="modeBtn">Modo: com feedback</button>
+        </div>
+
+        <article class="activity-card" aria-live="polite">
+          <div class="activity-top">
+            <div class="number-badge" id="cardNumber">1</div>
+            <div class="stage-pill" id="cardStage">Etapa</div>
+          </div>
+
+          <div class="activity-illustration">
+            <svg class="beer-icon" viewBox="0 0 240 150" role="img" aria-label="Ilustração do processo de cerveja">
+              <rect x="12" y="100" width="216" height="22" rx="8" fill="#1a0c03" opacity=".8"/>
+              <rect x="33" y="38" width="38" height="68" rx="11" fill="#f0a51a"/>
+              <rect x="81" y="26" width="38" height="80" rx="11" fill="#ffd477"/>
+              <rect x="129" y="44" width="38" height="62" rx="11" fill="#f0a51a"/>
+              <rect x="177" y="32" width="38" height="74" rx="11" fill="#ffd477"/>
+              <rect x="41" y="22" width="22" height="22" rx="4" fill="#e49a11"/>
+              <rect x="89" y="10" width="22" height="22" rx="4" fill="#e49a11"/>
+              <rect x="137" y="28" width="22" height="22" rx="4" fill="#e49a11"/>
+              <rect x="185" y="16" width="22" height="22" rx="4" fill="#e49a11"/>
+              <circle cx="52" cy="126" r="10" fill="#111"/><circle cx="100" cy="126" r="10" fill="#111"/><circle cx="148" cy="126" r="10" fill="#111"/><circle cx="196" cy="126" r="10" fill="#111"/>
+            </svg>
+          </div>
+
+          <div class="activity-body">
+            <h3 id="cardTitle">Atividade</h3>
+            <p id="cardDescription">Descrição da atividade.</p>
+          </div>
+        </article>
+
+        <div class="answer-buttons" id="answerButtons">
+          <button class="answer-btn green" type="button" onclick="answer('Agrega valor')">Agrega valor<small>verde</small></button>
+          <button class="answer-btn yellow" type="button" onclick="answer('Não agrega, mas é necessário')">Não agrega, mas é necessário<small>amarelo</small></button>
+          <button class="answer-btn red" type="button" onclick="answer('Não agrega valor')">Não agrega valor<small>vermelho</small></button>
+        </div>
+
+        <div id="feedback" class="feedback"></div>
+        <div id="nextRow" class="next-row">
+          <button class="btn" type="button" onclick="nextCard()">Próxima carta</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="endScreen" class="section end-screen card">
+      <h2>Resultado final</h2>
+      <p id="winnerText" class="subtitle" style="margin-left:auto;margin-right:auto;"></p>
+      <div class="winner-box">
+        <h3 style="margin:0; color:var(--gold-2);">Ranking</h3>
+        <div id="ranking" class="ranking"></div>
+        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:16px;">
+          <button class="btn" type="button" onclick="restartGame()">Jogar novamente</button>
+          <button class="btn secondary" type="button" onclick="copyResult()">Copiar resultado</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="answerTable" class="section">
+      <details class="card" open>
+        <summary>Tabela completa das 30 atividades e respostas</summary>
+        <div class="table-wrap" style="margin-top:14px;">
+          <table>
+            <thead>
+              <tr>
+                <th>Nº</th>
+                <th>Atividade</th>
+                <th>Etapa</th>
+                <th>Classificação</th>
+                <th>Justificativa</th>
+              </tr>
+            </thead>
+            <tbody id="activityTable"></tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <p class="footer-note">Whipped Process — site responsivo para apresentação em aula, com cartas, placar, correção automática e tabela-resposta.</p>
+  </main>
+
+  <script>
+    const CLASSES = {
+      VALUE: 'Agrega valor',
+      NECESSARY: 'Não agrega, mas é necessário',
+      WASTE: 'Não agrega valor'
+    };
+
+    const activities = [
+      { id: 1, title: 'Inspeção inicial da matéria-prima', stage: 'Recebimento', classification: CLASSES.NECESSARY, description: 'Conferir malte, lúpulo, levedura e embalagens antes do uso.', reason: 'Não transforma a cerveja, mas evita uso de insumos errados ou contaminados.' },
+      { id: 2, title: 'Adição de lúpulo', stage: 'Fervura', classification: CLASSES.VALUE, description: 'Adicionar lúpulo no mosto durante a fervura para trazer amargor, aroma e sabor.', reason: 'Altera diretamente características percebidas pelo cliente, como aroma e amargor.' },
+      { id: 3, title: 'Moagem do malte', stage: 'Preparação', classification: CLASSES.VALUE, description: 'Quebrar os grãos de malte para expor o amido que será convertido em açúcares.', reason: 'É transformação essencial para gerar o mosto fermentável.' },
+      { id: 4, title: 'Transporte interno entre setores', stage: 'Movimentação', classification: CLASSES.NECESSARY, description: 'Levar ingredientes, mosto, garrafas ou barris de uma área para outra.', reason: 'Não muda o produto, mas pode ser necessário para continuar o fluxo de produção.' },
+      { id: 5, title: 'Espera por equipamento disponível', stage: 'Espera', classification: CLASSES.WASTE, description: 'O lote fica parado porque tanque, bomba, filtro ou envase ainda não está livre.', reason: 'Tempo parado não transforma o produto nem acrescenta valor.' },
+      { id: 6, title: 'Limpeza e sanitização dos tanques', stage: 'Higienização', classification: CLASSES.NECESSARY, description: 'Limpar e sanitizar tanques, mangueiras e conexões antes do contato com o produto.', reason: 'Não agrega valor diretamente, mas é indispensável para segurança e qualidade.' },
+      { id: 7, title: 'Retrabalho por erro de receita', stage: 'Retrabalho', classification: CLASSES.WASTE, description: 'Corrigir um lote porque houve erro de dosagem ou procedimento.', reason: 'É uma correção causada por falha, consumindo tempo e recursos extras.' },
+      { id: 8, title: 'Mosturação', stage: 'Brassagem', classification: CLASSES.VALUE, description: 'Misturar malte moído com água quente para converter amido em açúcares fermentáveis.', reason: 'Transforma a matéria-prima e cria a base da cerveja.' },
+      { id: 9, title: 'Envase em garrafas ou latas', stage: 'Envase', classification: CLASSES.VALUE, description: 'Colocar a cerveja pronta na embalagem final para venda ou consumo.', reason: 'Entrega o produto em formato utilizável pelo cliente.' },
+      { id: 10, title: 'Registro de lote e rastreabilidade', stage: 'Controle', classification: CLASSES.NECESSARY, description: 'Anotar dados do lote, datas, ingredientes, medições e responsáveis.', reason: 'Não transforma o produto, mas é necessário para controle e rastreabilidade.' },
+      { id: 11, title: 'Produção em excesso sem demanda', stage: 'Superprodução', classification: CLASSES.WASTE, description: 'Produzir mais cerveja do que a previsão de venda ou armazenamento permite.', reason: 'Gera estoque, risco de perda e custo sem necessidade imediata.' },
+      { id: 12, title: 'Fermentação', stage: 'Fermentação', classification: CLASSES.VALUE, description: 'A levedura converte os açúcares do mosto em álcool, gás carbônico e compostos de aroma.', reason: 'É uma transformação central do produto.' },
+      { id: 13, title: 'Medição de temperatura e densidade', stage: 'Controle de qualidade', classification: CLASSES.NECESSARY, description: 'Acompanhar temperatura e densidade para controlar a evolução do processo.', reason: 'Não muda o produto diretamente, mas garante controle do processo.' },
+      { id: 14, title: 'Carbonatação', stage: 'Acabamento', classification: CLASSES.VALUE, description: 'Adicionar ou desenvolver gás carbônico para dar espuma e sensação correta à cerveja.', reason: 'Melhora uma característica percebida no consumo.' },
+      { id: 15, title: 'Procura por ferramentas ou peças', stage: 'Desorganização', classification: CLASSES.WASTE, description: 'Funcionários perdem tempo procurando mangueiras, conexões, ferramentas ou EPIs.', reason: 'Movimentação e tempo perdido não agregam valor.' },
+      { id: 16, title: 'Descarte por contaminação', stage: 'Perda', classification: CLASSES.WASTE, description: 'Um lote precisa ser descartado por falha de higienização ou contaminação.', reason: 'Representa perda direta de produto, insumos, tempo e dinheiro.' },
+      { id: 17, title: 'Refazer rótulos por erro de impressão', stage: 'Retrabalho', classification: CLASSES.WASTE, description: 'Rótulos incorretos precisam ser reimpressos e substituídos.', reason: 'É retrabalho causado por erro e não cria valor novo.' },
+      { id: 18, title: 'Pasteurização ou estabilização', stage: 'Segurança', classification: CLASSES.NECESSARY, description: 'Aplicar processo de estabilização quando exigido pelo produto ou padrão de qualidade.', reason: 'Nem sempre muda valor percebido, mas pode ser necessário para segurança e validade.' },
+      { id: 19, title: 'Maturação da cerveja', stage: 'Maturação', classification: CLASSES.VALUE, description: 'Manter a cerveja em repouso controlado para arredondar sabores e aromas.', reason: 'Melhora qualidade sensorial percebida pelo consumidor.' },
+      { id: 20, title: 'Conferência de validade e rotulagem', stage: 'Inspeção final', classification: CLASSES.NECESSARY, description: 'Verificar lote, validade, rótulo e informações obrigatórias antes da expedição.', reason: 'Não transforma a cerveja, mas evita problemas legais e de qualidade.' },
+      { id: 21, title: 'Manutenção preventiva de bombas', stage: 'Manutenção', classification: CLASSES.NECESSARY, description: 'Revisar bombas e conexões para evitar paradas durante a produção.', reason: 'Não agrega valor ao produto, mas protege o fluxo produtivo.' },
+      { id: 22, title: 'Movimentação desnecessária por layout ruim', stage: 'Desperdício de movimento', classification: CLASSES.WASTE, description: 'O operador anda muito porque ingredientes e equipamentos estão mal posicionados.', reason: 'Movimento excessivo consome tempo e energia sem transformar o produto.' },
+      { id: 23, title: 'Análise laboratorial de amostra', stage: 'Qualidade', classification: CLASSES.NECESSARY, description: 'Coletar amostra para verificar parâmetros microbiológicos ou físico-químicos.', reason: 'Não transforma a cerveja, mas confirma segurança e padrão.' },
+      { id: 24, title: 'Perda por vazamento em mangueira', stage: 'Perda', classification: CLASSES.WASTE, description: 'Cerveja, mosto ou água é perdido por conexão mal vedada.', reason: 'É desperdício direto de material e tempo.' },
+      { id: 25, title: 'Clarificação ou filtração final', stage: 'Acabamento', classification: CLASSES.VALUE, description: 'Remover partículas indesejadas para melhorar aparência, estabilidade e experiência de consumo.', reason: 'Melhora qualidade visual e sensorial percebida pelo cliente.' },
+      { id: 26, title: 'Controle de estoque de insumos', stage: 'Planejamento', classification: CLASSES.NECESSARY, description: 'Acompanhar quantidade de malte, lúpulo, levedura, garrafas e tampas disponíveis.', reason: 'Não transforma o produto, mas evita falta de material e interrupções.' },
+      { id: 27, title: 'Resfriamento do mosto', stage: 'Pós-fervura', classification: CLASSES.VALUE, description: 'Reduzir a temperatura do mosto para permitir inoculação correta da levedura.', reason: 'Prepara o produto para a fermentação e afeta a qualidade final.' },
+      { id: 28, title: 'Correção de vazamento após início do envase', stage: 'Retrabalho', classification: CLASSES.WASTE, description: 'Parar a linha para corrigir uma falha que deveria ter sido identificada antes.', reason: 'Parada e retrabalho geram atraso sem agregar valor.' },
+      { id: 29, title: 'Estoque parado por falta de programação', stage: 'Estoque excessivo', classification: CLASSES.WASTE, description: 'Produto fica armazenado por muito tempo porque não houve planejamento de venda ou entrega.', reason: 'Estoque parado aumenta custo e risco de perda.' },
+      { id: 30, title: 'Inoculação da levedura', stage: 'Fermentação', classification: CLASSES.VALUE, description: 'Adicionar levedura ao mosto resfriado para iniciar a fermentação.', reason: 'Começa a transformação biológica que forma a cerveja.' }
+    ];
+
+    let players = [];
+    let deck = [];
+    let currentIndex = 0;
+    let currentPlayerIndex = 0;
+    let answered = false;
+    let feedbackMode = true;
+    let lastResultText = '';
+
+    function clearInput(id) {
+      document.getElementById(id).value = '';
+    }
+
+    function shuffle(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function startGame() {
+      const names = [1,2,3,4]
+        .map(n => document.getElementById(`player${n}`).value.trim())
+        .filter(Boolean);
+
+      players = (names.length ? names : ['Jogador 1']).map(name => ({ name, score: 0, answers: 0, correct: 0 }));
+      deck = shuffle(activities);
+      currentIndex = 0;
+      currentPlayerIndex = 0;
+      answered = false;
+      lastResultText = '';
+
+      document.getElementById('setup').style.display = 'none';
+      document.getElementById('endScreen').style.display = 'none';
+      document.getElementById('game').style.display = 'grid';
+      renderScoreboard();
+      renderCard();
+      document.getElementById('game').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function restartGame() {
+      if (!players.length) return startGame();
+      players = players.map(p => ({ ...p, score: 0, answers: 0, correct: 0 }));
+      deck = shuffle(activities);
+      currentIndex = 0;
+      currentPlayerIndex = 0;
+      answered = false;
+      document.getElementById('endScreen').style.display = 'none';
+      document.getElementById('game').style.display = 'grid';
+      renderScoreboard();
+      renderCard();
+      document.getElementById('game').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function backToSetup() {
+      document.getElementById('game').style.display = 'none';
+      document.getElementById('endScreen').style.display = 'none';
+      document.getElementById('setup').style.display = 'grid';
+      document.getElementById('setup').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function renderScoreboard() {
+      const scoreList = document.getElementById('scoreList');
+      scoreList.innerHTML = players.map((p, index) => `
+        <div class="score-player ${index === currentPlayerIndex ? 'active' : ''}">
+          <div class="avatar">${index + 1}</div>
+          <div><strong>${escapeHTML(p.name)}</strong><small>${p.correct}/${p.answers} acertos</small></div>
+          <div class="score-points">${p.score}</div>
+        </div>
+      `).join('');
+
+      const progressText = document.getElementById('progressText');
+      const progressBar = document.getElementById('progressBar');
+      progressText.textContent = `${currentIndex}/${deck.length}`;
+      progressBar.style.width = `${(currentIndex / deck.length) * 100}%`;
+    }
+
+    function renderCard() {
+      const card = deck[currentIndex];
+      answered = false;
+      document.getElementById('cardNumber').textContent = card.id;
+      document.getElementById('cardStage').textContent = card.stage;
+      document.getElementById('cardTitle').textContent = card.title;
+      document.getElementById('cardDescription').textContent = card.description;
+      document.getElementById('turnPill').textContent = `Vez de: ${players[currentPlayerIndex].name}`;
+      document.getElementById('feedback').style.display = 'none';
+      document.getElementById('feedback').className = 'feedback';
+      document.getElementById('nextRow').style.display = 'none';
+      Array.from(document.querySelectorAll('.answer-btn')).forEach(btn => btn.disabled = false);
+      renderScoreboard();
+    }
+
+    function answer(choice) {
+      if (answered) return;
+      answered = true;
+      const card = deck[currentIndex];
+      const player = players[currentPlayerIndex];
+      const isCorrect = choice === card.classification;
+
+      player.answers += 1;
+      if (isCorrect) {
+        player.score += 1;
+        player.correct += 1;
+      }
+
+      const feedback = document.getElementById('feedback');
+      feedback.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
+      feedback.innerHTML = isCorrect
+        ? `✅ <strong>Acertou.</strong> A classificação correta é <strong>${card.classification}</strong>. ${card.reason}`
+        : `❌ <strong>Errou.</strong> Você marcou <strong>${choice}</strong>, mas a resposta correta é <strong>${card.classification}</strong>. ${card.reason}`;
+
+      lastResultText = `${player.name} respondeu a carta ${card.id} (${card.title}): ${isCorrect ? 'acertou' : 'errou'}. Resposta correta: ${card.classification}.`;
+
+      Array.from(document.querySelectorAll('.answer-btn')).forEach(btn => btn.disabled = true);
+
+      if (feedbackMode) {
+        feedback.style.display = 'block';
+        document.getElementById('nextRow').style.display = 'flex';
+      } else {
+        setTimeout(nextCard, 450);
+      }
+
+      renderScoreboard();
+    }
+
+    function nextCard() {
+      currentIndex += 1;
+      if (currentIndex >= deck.length) {
+        endGame();
+        return;
+      }
+      currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+      renderCard();
+    }
+
+    function endGame() {
+      document.getElementById('game').style.display = 'none';
+      document.getElementById('endScreen').style.display = 'block';
+      const sorted = [...players].sort((a,b) => b.score - a.score || a.name.localeCompare(b.name));
+      const topScore = sorted[0].score;
+      const winners = sorted.filter(p => p.score === topScore);
+      const winnerText = winners.length === 1
+        ? `Vencedor: ${winners[0].name}, com ${topScore} acerto${topScore === 1 ? '' : 's'}.`
+        : `Empate entre ${winners.map(w => w.name).join(', ')}, com ${topScore} acerto${topScore === 1 ? '' : 's'}.`;
+      document.getElementById('winnerText').textContent = winnerText;
+      document.getElementById('ranking').innerHTML = sorted.map((p, index) => `
+        <div class="rank-item">
+          <div class="avatar">${index + 1}</div>
+          <strong>${escapeHTML(p.name)}</strong>
+          <span class="score-points">${p.score}/${p.answers}</span>
+        </div>
+      `).join('');
+      document.getElementById('progressText').textContent = `${deck.length}/${deck.length}`;
+      document.getElementById('progressBar').style.width = '100%';
+      document.getElementById('endScreen').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function toggleAnswerMode() {
+      feedbackMode = !feedbackMode;
+      document.getElementById('modeBtn').textContent = feedbackMode ? 'Modo: com feedback' : 'Modo: rápido';
+    }
+
+    function scrollToTable() {
+      document.getElementById('answerTable').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function copyResult() {
+      const sorted = [...players].sort((a,b) => b.score - a.score || a.name.localeCompare(b.name));
+      const text = 'Resultado Whipped Process:\n' + sorted.map((p, i) => `${i+1}º ${p.name}: ${p.score}/${p.answers}`).join('\n');
+      navigator.clipboard?.writeText(text).then(() => alert('Resultado copiado!')).catch(() => alert(text));
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('activityTable');
+      tbody.innerHTML = activities.map(a => {
+        const pillClass = a.classification === CLASSES.VALUE ? 'class-value' : a.classification === CLASSES.NECESSARY ? 'class-necessary' : 'class-waste';
+        return `
+          <tr>
+            <td><strong>${a.id}</strong></td>
+            <td>${escapeHTML(a.title)}</td>
+            <td>${escapeHTML(a.stage)}</td>
+            <td><span class="class-pill ${pillClass}">${a.classification}</span></td>
+            <td>${escapeHTML(a.reason)}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function escapeHTML(value) {
+      return String(value).replace(/[&<>'"]/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      }[char]));
+    }
+
+    renderTable();
+  </script>
+</body>
+</html>
